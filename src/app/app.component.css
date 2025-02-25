@@ -10,6 +10,10 @@
   flex-direction: column;
 }
 
+.loading, .error {
+  margin: 30px 0;
+}
+
 .create-recipe {
   align-self: center;
 }

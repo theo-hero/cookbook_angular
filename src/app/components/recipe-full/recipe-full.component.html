@@ -1,9 +1,9 @@
 <h2>{{recipe?.title}}</h2>
 <div class="sections-container">
   <section>
-    <img *ngIf="!recipe?.imageURL" [src]="'../../../assets/default.png'">
-    <img *ngIf="recipe?.imageURL" [src]="'../../../assets/' + recipe.imageURL" alt="{{ recipe.title }}"
-      class="recipe-image" />
+    <img [src]="'../../../assets/default.png'">
+    <!-- <img *ngIf="recipe?.imageURL" [src]="'../../../assets/' + recipe.imageURL" alt="{{ recipe.title }}" -->
+      <!-- class="recipe-image" /> -->
   </section>
   <section>
     <h3>Ингредиенты</h3>
