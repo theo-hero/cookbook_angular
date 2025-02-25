@@ -1,8 +1,9 @@
 <h2>{{recipe?.title}}</h2>
 <div class="sections-container">
   <section>
-    <div class="image-block"></div>
-    <p class="tags">#вегетарианский #сладкий</p>
+    <div *ngIf="!recipe.imageURL" class="image-block"></div>
+    <img *ngIf="recipe.imageURL" [src]="'../../../assets/' + recipe.imageURL" alt="{{ recipe.title }}"
+      class="recipe-image" />
   </section>
   <section>
     <h3>Ингредиенты</h3>
@@ -15,7 +16,7 @@
     <p>{{ recipe?.instruction }}</p>
   </section>
 </div>
-<p *ngIf="!recipeId">No recipe selected.</p>
+<button (click)="deleteRecipe()">Удалить рецепт</button>
 <button class="close-window" (click)="closeTheWindow($event)">X</button>
 <button class="dots-menu" (click)="toggleOptionsMenu($event)">
   ...

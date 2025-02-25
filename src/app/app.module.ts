@@ -8,6 +8,8 @@ import { RecipeComponent } from './components/recipe/recipe.component';
 import { RecipesListComponent } from './components/recipes-list/recipes-list.component';
 import { RecipeFullComponent } from './components/recipe-full/recipe-full.component';
 import { HttpClientModule } from '@angular/common/http';
+import { CreateRecipeComponent } from './components/create-recipe/create-recipe.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -15,12 +17,14 @@ import { HttpClientModule } from '@angular/common/http';
     HeaderComponent,
     RecipeComponent,
     RecipesListComponent,
-    RecipeFullComponent
+    RecipeFullComponent,
+    CreateRecipeComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

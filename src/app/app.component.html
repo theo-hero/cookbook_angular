@@ -1,6 +1,11 @@
 <app-header />
-<app-recipes-list (recipeSelected)="showFullRecipe($event)"></app-recipes-list>
+<app-recipes-list (recipeSelected)="showFullRecipe($event)" [recipes]="recipes"></app-recipes-list>
+<button (click)="showCreateRecipe()">Добавить рецепт</button>
 
 <div *ngIf="recipeWindowIsVisible" class="recipe-window">
-  <app-recipe-full [recipeId]="selectedRecipeId" (closeWindow)="closeFullRecipe()"></app-recipe-full>
+  <app-recipe-full [recipeId]="selectedRecipeId" (closeWindow)="closeFullRecipe()" (deleteEntry)="deleteEntry($event)"></app-recipe-full>
+</div>
+
+<div *ngIf="createRecipeWindowIsVisible" class="recipe-window">
+  <app-create-recipe (closeWindow)="closeCreateRecipe()"></app-create-recipe>
 </div>

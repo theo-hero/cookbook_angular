@@ -6,7 +6,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./recipe.component.css']
 })
 export class RecipeComponent {
-  @Input() recipe!: { id: number, title: string, description: string };
+  @Input() recipe!: { id: number, title: string, description: string, dateCreated: string };
   @Output() clickEvent = new EventEmitter<number>();
 
   onClick() {

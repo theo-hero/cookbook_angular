@@ -1,7 +1,11 @@
 @import url("normalise.css");
 
+body {
+  background-color: rgb(254, 249, 244);
+}
+
 button {
-  background-color: transparent;
+  background-color: rgb(254, 249, 244);
   color: #000;
   /* border: 1px solid #000; */
   border-radius: 4px;
@@ -13,6 +17,15 @@ button {
 
 button:hover {
   background-color: rgba(116, 233, 112, 0.603);
+}
+
+button:disabled {
+  border: 2px solid #807e7d;
+  color: #807e7d;
+}
+
+input, textarea {
+  background-color: rgb(254, 249, 244);
 }
 
 /* button::after {

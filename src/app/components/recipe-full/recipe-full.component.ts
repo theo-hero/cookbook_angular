@@ -9,19 +9,32 @@ import { RecipeService } from 'src/recipe.service';
 export class RecipeFullComponent {
   @Input() recipeId: number | null = null;
   @Output() closeWindow = new EventEmitter<void>();
+  @Output() deleteEntry = new EventEmitter<number>();
   recipe: any = null;
 
   ngOnInit(): void {
     if (this.recipeId !== null) {
       this.recipeService.getRecipeById(this.recipeId).subscribe(data => {
         this.recipe = data;
+        if (this.recipe && this.recipe.ingredients) {
+          this.recipe.ingredients = this.parseIngredients(this.recipe.ingredients);
+        }
+        console.log(this.recipe);
+
       });
     } else {
       this.recipe = null;
     }
   }
 
-  constructor(private recipeService: RecipeService) {}
+  parseIngredients(ingredientsString: string): any[] {
+    return ingredientsString.split(':').map(ingredient => {
+      const [ingredientName, quantity, unitName] = ingredient.split('*');
+      return { ingredientName, quantity: parseFloat(quantity), unitName };
+    });
+  }
+
+  constructor(private recipeService: RecipeService) { }
 
   closeTheWindow(event: MouseEvent) {
     event.stopPropagation();
@@ -31,18 +44,21 @@ export class RecipeFullComponent {
   showOptionsMenu = false;
 
   toggleOptionsMenu(event: MouseEvent): void {
-    event.stopPropagation(); // Prevents the click from propagating to the document
+    event.stopPropagation();
     this.showOptionsMenu = !this.showOptionsMenu;
   }
 
   editRecipe(): void {
     console.log('Edit recipe functionality will be implemented here.');
-    this.showOptionsMenu = false; // Close the menu after selection
+    this.showOptionsMenu = false;
   }
 
   deleteRecipe(): void {
-    console.log('Delete recipe functionality will be implemented here.');
-    this.showOptionsMenu = false; // Close the menu after selection
+    if (this.recipeId !== null) {
+      this.deleteEntry.emit(this.recipeId);
+    } else {
+      console.error('Cannot delete recipe: recipeId is null');
+    }
   }
 
   @HostListener('document:click', ['$event'])
