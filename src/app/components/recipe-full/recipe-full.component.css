@@ -69,11 +69,13 @@ section:first-child .tags {
 .ingredients-grid div {
   display: flex;
   align-items: center;
+  text-align: left;
 }
 
 .ingredients-grid span {
   font-weight: bold;
   margin-right: 5px;
+  text-align: left;
 }
 
 section:nth-child(2)::-webkit-scrollbar {

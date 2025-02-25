@@ -3,9 +3,13 @@
 <button class="create-recipe" (click)="showCreateRecipe()">Добавить рецепт</button>
 
 <div *ngIf="recipeWindowIsVisible" class="recipe-window">
-  <app-recipe-full [recipeId]="selectedRecipeId" (closeWindow)="closeFullRecipe()" (deleteEntry)="deleteEntry($event)"></app-recipe-full>
+  <app-recipe-full [recipeId]="selectedRecipeId" (closeWindow)="closeFullRecipe()" (deleteEntry)="deleteEntry($event)" (editRecipeEvent)="editRecipe($event)"></app-recipe-full>
 </div>
 
 <div *ngIf="createRecipeWindowIsVisible" class="recipe-window">
-  <app-create-recipe (closeWindow)="closeCreateRecipe()"></app-create-recipe>
+  <app-create-recipe
+    [recipeToEdit]="getRecipeById(selectedRecipeId)"
+    (closeWindow)="closeCreateRecipe()"
+    (createUpdateRecipe)="createOrUpdateEntry($event)">
+  </app-create-recipe>
 </div>

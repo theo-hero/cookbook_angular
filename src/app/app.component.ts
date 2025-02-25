@@ -1,18 +1,29 @@
 import { Component } from '@angular/core';
 import { RecipeService } from 'src/recipe.service';
 
+interface Recipe {
+  id: number;
+  title: string;
+  description: string;
+  instruction: string;
+  img_url: string;
+  ingredients: any;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent  {
+
+export class AppComponent {
   recipeWindowIsVisible = false;
-  selectedRecipeId: number | null = null;
   createRecipeWindowIsVisible = false;
+  selectedRecipeId: number | null = null;
+  recipeToEdit: any;
   recipes: any[] = [];
 
-  constructor(private recipeService: RecipeService) {}
+  constructor(private recipeService: RecipeService) { }
 
   ngOnInit(): void {
     this.recipeService.getRecipes().subscribe(data => {
@@ -51,5 +62,52 @@ export class AppComponent  {
         console.error('Error deleting recipe:', error);
       }
     );
+  }
+
+  createOrUpdateEntry(recipe: Recipe) {
+    const recipeDTO = {
+      id: recipe.id,
+      title: recipe.title,
+      description: recipe.description,
+      instruction: recipe.instruction,
+      img_url: recipe.img_url || '',
+      ingredients: recipe.ingredients.map((ingredient: any) => ({
+        quantity: ingredient.quantity,
+        unitName: ingredient.unit,
+        ingredientName: ingredient.name || ingredient.customName
+      }))
+    };
+    if (recipe.id) this.updateEntry(recipe.id, recipeDTO);
+    else this.createEntry(recipeDTO);
+  }
+
+  createEntry(recipeDTO: Recipe) {
+    this.recipeService.postRecipe(recipeDTO).subscribe(
+      (response) => {
+        console.log('Recipe created successfully:', response);
+        alert('Рецепт был сохранён!');
+      },
+      (error) => console.error('Error creating recipe:', error)
+    );
+  }
+
+  updateEntry(recipe_id: number, recipeDTO: Recipe) {
+    this.recipeService.updateRecipe(recipe_id, recipeDTO).subscribe(
+      (response) => {
+        console.log('Recipe updated successfully:', response);
+        alert('Рецепт был обновлён!');
+      },
+      (error) => console.error('Error updating recipe:', error)
+    );
+  }
+
+  getRecipeById(id: number | null): any | null {
+    if (!id) return null;
+    return this.recipes.find((recipe) => recipe.id === id) || null;
+  }
+
+  editRecipe(recipeId: any): void {
+    this.recipeToEdit = this.recipes.find((recipe) => recipe.id === recipeId);
+    this.showCreateRecipe();
   }
 }

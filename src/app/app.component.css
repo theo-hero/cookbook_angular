@@ -13,3 +13,8 @@
 .create-recipe {
   align-self: center;
 }
+
+app-create-recipe {
+  overflow-y: auto;
+  padding: 20px;
+}

@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RecipeService } from 'src/recipe.service';
+import { forkJoin } from 'rxjs';
 
 interface Ingredient {
   name: string;
@@ -14,9 +15,9 @@ interface Ingredient {
   styleUrls: ['./create-recipe.component.css']
 })
 export class CreateRecipeComponent {
-  @Input() recipeToEdit: any = null; // Optional input for editing an existing recipe
+  @Input() recipeToEdit: any = null;
   @Output() closeWindow = new EventEmitter<void>();
-  @Output() recipeUpdated = new EventEmitter<any>();
+  @Output() createUpdateRecipe = new EventEmitter<any>();
 
   ingredientOptions: string[] = [];
   unitOptions: string[] = [];
@@ -25,35 +26,33 @@ export class CreateRecipeComponent {
     id: null,
     title: '',
     description: '',
-    instructions: '',
+    instruction: '',
     ingredients: [] as Ingredient[],
-    imageURL: ''
+    img_url: ''
   };
 
-  constructor(private recipeService: RecipeService) {}
+  constructor(private recipeService: RecipeService) { }
 
   ngOnInit(): void {
-    this.recipeService.getUnits().subscribe(
-      (response) => (this.unitOptions = response),
-      (error) => console.error('Error fetching unit options:', error)
-    );
+    const fetchUnitOptions$ = this.recipeService.getUnits();
+    const fetchIngredientOptions$ = this.recipeService.getIngredients();
 
-    this.recipeService.getIngredients().subscribe(
-      (response) => (this.ingredientOptions = response),
-      (error) => console.error('Error fetching ingredient options:', error)
-    );
+    forkJoin([fetchUnitOptions$, fetchIngredientOptions$]).subscribe({
+      next: ([unitResponse, ingredientResponse]) => {
+        this.unitOptions = unitResponse;
+        this.ingredientOptions = ingredientResponse;
 
-    if (this.recipeToEdit) {
-      this.recipe = {
-        ...this.recipeToEdit,
-        ingredients: this.recipeToEdit.ingredients.map((ing: any) => ({
-          name: ing.ingredientName,
-          customName: '',
-          quantity: ing.quantity,
-          unit: ing.unitName
-        }))
-      };
-    }
+        if (this.recipeToEdit) {
+          this.recipe = {
+            ...this.recipeToEdit,
+            ingredients: this.parseIngredients(this.recipeToEdit.ingredients)
+          };
+        }
+      },
+      error: (error: any) => {
+        console.error('Error fetching options:', error);
+      }
+    });
   }
 
   addIngredient(): void {
@@ -61,7 +60,9 @@ export class CreateRecipeComponent {
   }
 
   removeIngredient(index: number): void {
-    this.recipe.ingredients.splice(index, 1);
+    if (index >= 0 && index < this.recipe.ingredients.length) {
+      this.recipe.ingredients.splice(index, 1);
+    }
   }
 
   closeTheWindow(event: MouseEvent): void {
@@ -69,45 +70,51 @@ export class CreateRecipeComponent {
     this.closeWindow.emit();
   }
 
-  onSubmit(form: any): void {
-    if (form.valid) {
-      const recipeDTO = {
-        id: this.recipe.id,
-        title: this.recipe.title,
-        description: this.recipe.description,
-        instruction: this.recipe.instructions,
-        img_url: this.recipe.imageURL || '',
-        ingredients: this.recipe.ingredients.map((ingredient: Ingredient) => ({
-          quantity: ingredient.quantity,
-          unitName: ingredient.unit,
-          ingredientName: ingredient.name || ingredient.customName
-        }))
+  parseIngredients(ingredientsString: string): any[] {
+    return ingredientsString.split(':').map(ingredient => {
+      const [name, quantity, unit] = ingredient.split('*');
+      const parsedIngredient = {
+        name: name.trim(),
+        quantity: parseFloat(quantity),
+        unit: unit.trim(),
+        customName: ""
       };
 
-      if (this.recipe.id) {
-        this.recipeService.updateRecipe(this.recipe.id, recipeDTO).subscribe(
-          (response) => {
-            console.log('Recipe updated successfully:', response);
-            alert('Рецепт был обновлён!');
-            this.recipeUpdated.emit(response);
-            this.closeWindow.emit();
-          },
-          (error) => console.error('Error updating recipe:', error)
-        );
-      } else {
-
-        this.recipeService.postRecipe(recipeDTO).subscribe(
-          (response) => {
-            console.log('Recipe created successfully:', response);
-            alert('Рецепт был сохранён!');
-            this.recipe.ingredients = [];
-            form.reset();
-          },
-          (error) => console.error('Error creating recipe:', error)
-        );
+      if (!this.ingredientOptions.includes(parsedIngredient.name)) {
+        parsedIngredient.name = 'custom';
+        parsedIngredient.customName = name.trim();
       }
-    } else {
+
+      if (!this.unitOptions.includes(parsedIngredient.unit)) {
+        parsedIngredient.unit = '';
+      }
+
+      return parsedIngredient;
+    });
+  }
+
+  onSubmit(): void {
+    if (
+      this.recipe.title.trim() === '' ||
+      this.recipe.description.trim() === '' ||
+      this.recipe.instruction.trim() === '' ||
+      this.recipe.ingredients.some((ing) => !ing.name || ing.quantity === null || !ing.unit)
+    ) {
       alert('Пожалуйста, заполните все необходимые поля');
+      return;
     }
+
+    this.createUpdateRecipe.emit(this.recipe);
+
+    this.recipe = {
+      id: null,
+      title: '',
+      description: '',
+      instruction: '',
+      ingredients: [],
+      img_url: ''
+    };
+
+    this.closeWindow.emit();
   }
 }

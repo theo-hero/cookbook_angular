@@ -10,6 +10,7 @@ export class RecipeFullComponent {
   @Input() recipeId: number | null = null;
   @Output() closeWindow = new EventEmitter<void>();
   @Output() deleteEntry = new EventEmitter<number>();
+  @Output() editRecipeEvent = new EventEmitter<number>();
   recipe: any = null;
 
   ngOnInit(): void {
@@ -19,8 +20,7 @@ export class RecipeFullComponent {
         if (this.recipe && this.recipe.ingredients) {
           this.recipe.ingredients = this.parseIngredients(this.recipe.ingredients);
         }
-        console.log(this.recipe);
-
+        //console.log(this.recipe);
       });
     } else {
       this.recipe = null;
@@ -49,13 +49,18 @@ export class RecipeFullComponent {
   }
 
   editRecipe(): void {
-    console.log('Edit recipe functionality will be implemented here.');
+    if (this.recipe) {
+      this.editRecipeEvent.emit(this.recipe.id);
+    } else {
+      console.error('Cannot edit recipe: recipe is null');
+    }
     this.showOptionsMenu = false;
   }
 
   deleteRecipe(): void {
     if (this.recipeId !== null) {
-      this.deleteEntry.emit(this.recipeId);
+      const confirmed = confirm('Вы уверены, что хотите удалить этот рецепт? Это действие нельзя отменить.');
+      if (confirmed) this.deleteEntry.emit(this.recipeId);
     } else {
       console.error('Cannot delete recipe: recipeId is null');
     }

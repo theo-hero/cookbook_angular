@@ -16,7 +16,7 @@ button {
 }
 
 button:hover {
-  background-color: rgba(116, 233, 112, 0.603);
+  background-color: #ABF0A5;
 }
 
 button:disabled {
