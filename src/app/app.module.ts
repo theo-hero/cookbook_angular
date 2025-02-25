@@ -10,6 +10,7 @@ import { RecipeFullComponent } from './components/recipe-full/recipe-full.compon
 import { HttpClientModule } from '@angular/common/http';
 import { CreateRecipeComponent } from './components/create-recipe/create-recipe.component';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -24,9 +25,11 @@ import { FormsModule } from '@angular/forms';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }

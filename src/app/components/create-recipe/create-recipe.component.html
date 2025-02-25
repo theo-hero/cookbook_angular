@@ -49,7 +49,7 @@
 
   <div *ngFor="let ingredient of recipe.ingredients; let i = index" class="ingredient-row">
     <div class="form-group row">
-      <div>
+      <div class="input-ingredient">
         <select
           id="ingredient-name-{{i}}"
           [(ngModel)]="ingredient.name"

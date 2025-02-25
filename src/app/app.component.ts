@@ -22,12 +22,14 @@ export class AppComponent {
   selectedRecipeId: number | null = null;
   recipeToEdit: any;
   recipes: any[] = [];
+  loading: boolean = true;
 
   constructor(private recipeService: RecipeService) { }
 
   ngOnInit(): void {
     this.recipeService.getRecipes().subscribe(data => {
       this.recipes = data;
+      this.loading = false;
     });
   }
 
@@ -86,6 +88,7 @@ export class AppComponent {
       (response) => {
         console.log('Recipe created successfully:', response);
         alert('Рецепт был сохранён!');
+        this.recipes.push(recipeDTO);
       },
       (error) => console.error('Error creating recipe:', error)
     );
